@@ -34,6 +34,8 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.bumptech.glide.Glide;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -65,14 +67,14 @@ public class PUtils {
     }
 
     public static void clearMemory(Context context) {
-        GlideApp.get(context.getApplicationContext()).clearMemory();
+        Glide.get(context.getApplicationContext()).clearMemory();
     }
 
     public static void cleanDiskCache(final Context context) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                GlideApp.get(context.getApplicationContext()).clearDiskCache();
+                Glide.get(context.getApplicationContext()).clearDiskCache();
             }
         }).start();
     }

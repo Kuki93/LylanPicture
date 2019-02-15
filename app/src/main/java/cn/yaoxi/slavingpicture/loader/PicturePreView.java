@@ -3,6 +3,8 @@ package cn.yaoxi.slavingpicture.loader;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.IntEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
@@ -128,19 +130,13 @@ public class PicturePreView extends FrameLayout {
 
         mViewPager.setTranslationX(rect.left);
         mViewPager.setTranslationY(rect.top);
-        mViewPager.animate().translationX(0).translationY(0).setDuration(ImageBrowser.DEFAULT_ANIMATOR_TIME)
-                .setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
-                    IntEvaluator evaluator = new IntEvaluator();
+        PropertyValuesHolder pvhX = PropertyValuesHolder.ofFloat("translationX", 0);
+        PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat("translationY", 0);
 
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        float fraction = animation.getAnimatedFraction();
-                        layoutParams.width = evaluator.evaluate(fraction, rect.width(), endX);
-                        layoutParams.height = evaluator.evaluate(fraction, rect.height(), endY);
-                        mViewPager.setLayoutParams(layoutParams);
-                    }
-                }).setListener(new AnimatorListenerAdapter() {
+        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(mViewPager, pvhX, pvhY)
+                .setDuration(ImageBrowser.DEFAULT_ANIMATOR_TIME);
+        animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 layoutParams.width = endX;
@@ -148,7 +144,18 @@ public class PicturePreView extends FrameLayout {
                 mViewPager.setLayoutParams(layoutParams);
                 addOtherView();
             }
-        }).start();
+        });
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            IntEvaluator evaluator = new IntEvaluator();
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        float fraction = animation.getAnimatedFraction();
+                        layoutParams.width = evaluator.evaluate(fraction, rect.width(), endX);
+                        layoutParams.height = evaluator.evaluate(fraction, rect.height(), endY);
+                        mViewPager.setLayoutParams(layoutParams);
+                    }
+                });
+        animator.start();
     }
 
     private void addOtherView() {
@@ -326,39 +333,48 @@ public class PicturePreView extends FrameLayout {
     }
 
     private void startResetAnim() {
-        mViewPager.animate().y(0).setDuration(ImageBrowser.DEFAULT_ANIMATOR_TIME / 3)
-                .setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mViewPager, "y", 0)
+                .setDuration(ImageBrowser.DEFAULT_ANIMATOR_TIME /3);
 
-                    }
-                })
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                    }
-                }).start();
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+        });
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            IntEvaluator evaluator = new IntEvaluator();
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+
+            }
+        });
+        animator.start();
     }
 
     private void startExitAnim() {
-        mViewPager.animate().alpha(0)
-                .y(mViewPager.getY() >= 0 ? mViewPager.getHeight() : -mViewPager.getHeight())
-                .setDuration(ImageBrowser.DEFAULT_ANIMATOR_TIME / 2)
-                .setInterpolator(new AccelerateInterpolator())
-                .setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
 
-                    }
-                })
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        ImageBrowser.release((Activity) getContext(), PicturePreView.this);
-                    }
-                }).start();
+        PropertyValuesHolder pvhX = PropertyValuesHolder.ofFloat("alpha", 0);
+        PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat("y", mViewPager.getY() >= 0 ? mViewPager.getHeight() : -mViewPager.getHeight());
+
+        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(mViewPager, pvhX, pvhY)
+                .setDuration(ImageBrowser.DEFAULT_ANIMATOR_TIME / 2);
+        animator .setInterpolator(new AccelerateInterpolator());
+
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                ImageBrowser.release((Activity) getContext(), PicturePreView.this);
+            }
+        });
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            IntEvaluator evaluator = new IntEvaluator();
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+
+            }
+        });
+        animator.start();
     }
 
     public void hide() {

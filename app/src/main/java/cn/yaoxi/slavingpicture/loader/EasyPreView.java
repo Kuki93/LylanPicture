@@ -22,6 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -62,6 +63,8 @@ public class EasyPreView extends FrameLayout {
     public static final RequestOptions DOWNLOAD_ONLY_OPTIONS =
             new RequestOptions().diskCacheStrategy(DiskCacheStrategy.DATA).priority(Priority.HIGH)
                     .skipMemoryCache(true);
+
+    private final RequestOptions CACHE_ONLY_OPTIONS = new RequestOptions().onlyRetrieveFromCache(true);
 
     private ProgressWheel mProgressView;
     private TextView tvProgress;
@@ -177,7 +180,7 @@ public class EasyPreView extends FrameLayout {
                             }
                         }
                     };
-                    GlideApp.with(getContext()).downloadOnly().load(uri)
+                    Glide.with(getContext()).downloadOnly().load(uri)
                             .apply(DOWNLOAD_ONLY_OPTIONS).into(target);
                 }
             }
@@ -195,8 +198,7 @@ public class EasyPreView extends FrameLayout {
                 if (photoView == null) {
                     photoView = new PhotoView(getContext());
                 }
-
-                GlideApp.with(getContext()).load(file).into(photoView);
+                Glide.with(getContext()).load(file).into(photoView);
                 mDisPlayView = photoView;
                 break;
             default:
@@ -473,8 +475,8 @@ public class EasyPreView extends FrameLayout {
             public void run() {
                 File file = null;
                 try {
-                    file = GlideApp.with(getContext()).downloadOnly().load(url).
-                            onlyRetrieveFromCache(true).submit().get();
+                    file = Glide.with(getContext()).downloadOnly().load(url).
+                            apply(CACHE_ONLY_OPTIONS).submit().get();
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 } finally {

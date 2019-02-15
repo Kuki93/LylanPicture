@@ -4,8 +4,6 @@ import android.graphics.PointF;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
-import java.util.Objects;
-
 public class DisplayOptimizeListener extends SubsamplingScaleImageView.DefaultOnImageEventListener {
     private static final float LONG_IMAGE_SIZE_RATIO = 2f;
 
@@ -62,15 +60,15 @@ public class DisplayOptimizeListener extends SubsamplingScaleImageView.DefaultOn
             // scale to fit screen, and center
             if (!hasZeroValue && (float) imageHeight / imageWidth > LONG_IMAGE_SIZE_RATIO) {
                 // scale at top
-                Objects.requireNonNull(mImageView
-                        .animateScaleAndCenter(scale, new PointF(imageWidth / 2, 0)))
+                mImageView
+                        .animateScaleAndCenter(scale, new PointF(imageWidth / 2, 0))
                         .withEasing(SubsamplingScaleImageView.EASE_OUT_QUAD)
                         .withOnAnimationEventListener(new SubsamplingScaleImageView.DefaultOnAnimationEventListener() {
-                            @Override
-                            public void onComplete() {
-                                mImageView.setMinScale(minScale);
-                            }
-                        })
+                                                          @Override
+                                                          public void onComplete() {
+                                                              mImageView.setMinScale(minScale);
+                                                          }
+                                                      })
                         .start();
             } else {
                 mImageView.setMinScale(minScale);
@@ -83,8 +81,8 @@ public class DisplayOptimizeListener extends SubsamplingScaleImageView.DefaultOn
         } else {
             if (!hasZeroValue && (float) imageHeight / imageWidth > LONG_IMAGE_SIZE_RATIO) {
                 // scale at top
-                Objects.requireNonNull(mImageView
-                        .animateScaleAndCenter(scale, new PointF(imageWidth / 2, 0)))
+                mImageView
+                        .animateScaleAndCenter(scale, new PointF(imageWidth / 2, 0))
                         .withEasing(SubsamplingScaleImageView.EASE_OUT_QUAD)
                         .start();
             }

@@ -9,22 +9,37 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+
 import java.io.File;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 
 public class ImageBrowser {
 
     private Builder builder;
     private static boolean open;
     private static boolean isFullScreen;
+    private static boolean glideInit;
     static int DEFAULT_ANIMATOR_TIME = 450;
+
 
     private ImageBrowser(@NonNull Activity activity) {
         builder = createImageBuilder(activity);
     }
 
     public static ImageBrowser with(@NonNull Activity activity) {
+        if (!glideInit) {
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.connectTimeout(30, TimeUnit.SECONDS);
+            builder.writeTimeout(30, TimeUnit.SECONDS);
+            builder.readTimeout(30, TimeUnit.SECONDS);
+            OkHttpClient okHttpClient = builder.build();
+            GlideProgressSupport.init(Glide.get(activity), okHttpClient);
+            glideInit = true;
+        }
         return new ImageBrowser(activity);
     }
 
@@ -242,11 +257,10 @@ public class ImageBrowser {
             if (open) {
                 return;
             }
-            final ViewGroup viewGroup = (ViewGroup) Objects.requireNonNull(activity)
-                    .findViewById(android.R.id.content).getRootView();
-            Objects.requireNonNull(viewGroup);
-            Objects.requireNonNull(imageBrowserConfig);
-            if (PUtils.isNullOrEmpty(imageBrowserConfig.getSources())) {
+            final ViewGroup viewGroup = (ViewGroup) activity.findViewById(android.R.id.content).getRootView();
+
+            if (viewGroup == null || imageBrowserConfig == null ||
+                    PUtils.isNullOrEmpty(imageBrowserConfig.getSources())) {
                 throw new NullPointerException();
             }
 
